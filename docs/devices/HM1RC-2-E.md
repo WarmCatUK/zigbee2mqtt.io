@@ -1,23 +1,32 @@
 ---
 title: "HEIMAN HM1RC-2-E control via MQTT"
-description: "Integrate your HEIMAN HM1RC-2-E via Zigbee2MQTT with whatever smart home
- infrastructure you are using without the vendors bridge or gateway."
+description: "Integrate your HEIMAN HM1RC-2-E via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
+addedAt: 2021-02-03T17:47:43Z
+pageClass: device-page
 ---
 
-*To contribute to this page, edit the following
-[file](https://github.com/Koenkk/zigbee2mqtt.io/blob/master/docs/devices/HM1RC-2-E.md)*
+<!-- !!!! -->
+<!-- ATTENTION: This file is auto-generated through docgen! -->
+<!-- You can only edit the "Notes"-Section between the two comment lines "Notes BEGIN" and "Notes END". -->
+<!-- Do not use h1 or h2 heading within "## Notes"-Section. -->
+<!-- !!!! -->
 
 # HEIMAN HM1RC-2-E
 
+|     |     |
+|-----|-----|
 | Model | HM1RC-2-E  |
-| Vendor  | HEIMAN  |
+| Vendor  | [HEIMAN](/supported-devices/#v=HEIMAN)  |
 | Description | Smart remote controller |
 | Exposes | battery, action, linkquality |
-| Picture | ![HEIMAN HM1RC-2-E](../images/devices/HM1RC-2-E.jpg) |
+| Picture | ![HEIMAN HM1RC-2-E](https://www.zigbee2mqtt.io/images/devices/HM1RC-2-E.jpg) |
 
-## Notes
 
-None
+<!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
+
+
+<!-- Notes END: Do not edit below this line -->
+
 
 
 ## Exposes
@@ -33,7 +42,7 @@ The unit of this value is `%`.
 Triggered action (e.g. a button click).
 Value can be found in the published state on the `action` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
-The possible values are: `emergency`, `disarm`, `arm_partial_zones`, `arm_all_zones`.
+The possible values are: `emergency`, `disarm`, `arm_day_zones`, `arm_all_zones`.
 
 ### Linkquality (numeric)
 Link quality (signal strength).
@@ -41,37 +50,4 @@ Value can be found in the published state on the `linkquality` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The minimal value is `0` and the maximum value is `255`.
 The unit of this value is `lqi`.
-
-## Manual Home Assistant configuration
-Although Home Assistant integration through [MQTT discovery](../integration/home_assistant) is preferred,
-manual integration is possible with the following configuration:
-
-
-{% raw %}
-```yaml
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.battery }}"
-    unit_of_measurement: "%"
-    device_class: "battery"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.action }}"
-    icon: "mdi:gesture-double-tap"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.linkquality }}"
-    unit_of_measurement: "lqi"
-    icon: "mdi:signal"
-```
-{% endraw %}
-
 

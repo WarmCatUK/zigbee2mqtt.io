@@ -1,22 +1,42 @@
 ---
 title: "iCasa ICZB-KPD18S control via MQTT"
-description: "Integrate your iCasa ICZB-KPD18S via Zigbee2MQTT with whatever smart home
- infrastructure you are using without the vendors bridge or gateway."
+description: "Integrate your iCasa ICZB-KPD18S via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
+addedAt: 2019-11-09T18:37:38Z
+pageClass: device-page
 ---
 
-*To contribute to this page, edit the following
-[file](https://github.com/Koenkk/zigbee2mqtt.io/blob/master/docs/devices/ICZB-KPD18S.md)*
+<!-- !!!! -->
+<!-- ATTENTION: This file is auto-generated through docgen! -->
+<!-- You can only edit the "Notes"-Section between the two comment lines "Notes BEGIN" and "Notes END". -->
+<!-- Do not use h1 or h2 heading within "## Notes"-Section. -->
+<!-- !!!! -->
 
 # iCasa ICZB-KPD18S
 
+|     |     |
+|-----|-----|
 | Model | ICZB-KPD18S  |
-| Vendor  | iCasa  |
+| Vendor  | [iCasa](/supported-devices/#v=iCasa)  |
 | Description | Zigbee 3.0 Keypad Pulse 8S |
 | Exposes | battery, action, linkquality |
-| Picture | ![iCasa ICZB-KPD18S](../images/devices/ICZB-KPD18S.jpg) |
+| Picture | ![iCasa ICZB-KPD18S](https://www.zigbee2mqtt.io/images/devices/ICZB-KPD18S.jpg) |
 
+
+<!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
 ## Notes
 
+
+### Pairing
+
+To Reset the iCasa ICZB-KPD18S do the following:
+1) Press and hold down both OFF button and the ON button until the LED indicator on the remote turns on.
+2) Than immediately click OFF button 5 times. 3) The LED status indicator flashes 3 times to indicate successful reset.
+
+Pairing mode:
+1) Press and hold down OFF and ON button simultaneously until the status LED indicator on the remote turns on,
+then immediately click ON button.
+2) The status LED indicator on the remote will blink fast.
+3) When the pairing is successful the status LED indicator on the remote will blink 6 times.
 
 ### Deprecated click event
 By default this device exposes a deprecated `click` event. It's recommended to use the `action` event instead.
@@ -36,19 +56,26 @@ By default (for backwards compatibility purposes) the legacy integration is enab
 For new users it is recommended to **disable** this as it has several fundamental problems.
 To disable the legacy integration add the following to your `configuration.yaml`:
 
-{% raw %}
+
 ```yaml
 '0xabc457fffe679xyz':
     friendly_name: my_remote
     legacy: false
 ```
-{% endraw %}
+<!-- Notes END: Do not edit below this line -->
 
-### Device type specific configuration
-*[How to use device type specific configuration](../information/configuration.md)*
 
-* `legacy`: Set to `false` to disable the legacy integration (highly recommended!) (default: true)
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
 
+* `legacy`: Set to false to disable the legacy integration (highly recommended), will change structure of the published payload (default true). The value must be `true` or `false`
+
+* `simulated_brightness`: Simulate a brightness value. If this device provides a brightness_move_up or brightness_move_down action it is possible to specify the update interval and delta. Note: will only work when legacy: false is set. Example:
+```yaml
+simulated_brightness:
+  delta: 20 # delta per interval, default = 20
+  interval: 200 # interval in milliseconds, default = 200
+```
 
 
 ## Exposes
@@ -72,44 +99,4 @@ Value can be found in the published state on the `linkquality` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The minimal value is `0` and the maximum value is `255`.
 The unit of this value is `lqi`.
-
-## Manual Home Assistant configuration
-Although Home Assistant integration through [MQTT discovery](../integration/home_assistant) is preferred,
-manual integration is possible with the following configuration:
-
-
-{% raw %}
-```yaml
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    icon: "mdi:toggle-switch"
-    value_template: "{{ value_json.click }}"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.battery }}"
-    unit_of_measurement: "%"
-    device_class: "battery"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.action }}"
-    icon: "mdi:gesture-double-tap"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.linkquality }}"
-    unit_of_measurement: "lqi"
-    icon: "mdi:signal"
-```
-{% endraw %}
-
 

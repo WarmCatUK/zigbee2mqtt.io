@@ -1,31 +1,35 @@
 ---
 title: "Xiaomi ZNCLDJ11LM control via MQTT"
-description: "Integrate your Xiaomi ZNCLDJ11LM via Zigbee2MQTT with whatever smart home
- infrastructure you are using without the vendors bridge or gateway."
+description: "Integrate your Xiaomi ZNCLDJ11LM via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
+addedAt: 2019-07-22T20:08:17Z
+pageClass: device-page
 ---
 
-*To contribute to this page, edit the following
-[file](https://github.com/Koenkk/zigbee2mqtt.io/blob/master/docs/devices/ZNCLDJ11LM.md)*
+<!-- !!!! -->
+<!-- ATTENTION: This file is auto-generated through docgen! -->
+<!-- You can only edit the "Notes"-Section between the two comment lines "Notes BEGIN" and "Notes END". -->
+<!-- Do not use h1 or h2 heading within "## Notes"-Section. -->
+<!-- !!!! -->
 
 # Xiaomi ZNCLDJ11LM
 
+|     |     |
+|-----|-----|
 | Model | ZNCLDJ11LM  |
-| Vendor  | Xiaomi  |
+| Vendor  | [Xiaomi](/supported-devices/#v=Xiaomi)  |
 | Description | Aqara curtain motor |
-| Exposes | cover (state, position), linkquality |
-| Picture | ![Xiaomi ZNCLDJ11LM](../images/devices/ZNCLDJ11LM.jpg) |
+| Exposes | cover (state, position), running, motor_state, linkquality |
+| Picture | ![Xiaomi ZNCLDJ11LM](https://www.zigbee2mqtt.io/images/devices/ZNCLDJ11LM.jpg) |
 
+
+<!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
 ## Notes
 
 
 ### Pairing
-Hold button for a few seconds until red light turn on.
+Hold button for about 5 seconds until blue light turn on.
 
-### Device type specific configuration
-*[How to use device type specific configuration](../information/configuration.md)*
-
-* `invert_cover`: By default the position/tilt values mean: open = 100, closed = 0. This can be inverted by setting this option to true (so open = 0, close = 100).
-
+If you need to reset device first, hold button longer until red light turn on.
 
 ### Configuration of device attributes
 By publishing to `zigbee2mqtt/FRIENDLY_NAME/set` various device attributes can be configured:
@@ -64,7 +68,8 @@ Home Assistant automation example:
   - service: mqtt.publish
     data:
       topic: zigbee2mqtt/<FRIENDLY_NAME>/set
-      payload: "{ 'options': { 'reset_limits': true } }"
+      payload: "{ \"options\": { \"reset_limits\": true } }"
+      # note "" are escaped with \ else will not work if you want to send payload as json
   - service: cover.close_cover
     entity_id: cover.<COVER_ID>
   - delay:
@@ -74,16 +79,37 @@ Home Assistant automation example:
 ```
 
 Motor leaves calibration mode automatically after it reaches the both open and close curtain position limits. Calibration is mandatory for proper position reporting and ability to set intermediate positions.
+<!-- Notes END: Do not edit below this line -->
 
+## OTA updates
+This device supports OTA updates, for more information see [OTA updates](../guide/usage/ota_updates.md).
+
+
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `invert_cover`: Inverts the cover position, false: open=100,close=0, true: open=0,close=100 (default false). The value must be `true` or `false`
 
 
 ## Exposes
 
 ### Cover 
 The current state of this cover is in the published state under the `state` property (value is `OPEN` or `CLOSE`).
-To control this cover publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"state": "OPEN"}` or `{"state": "CLOSE"}`.
+To control this cover publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"state": "OPEN"}`, `{"state": "CLOSE"}`, `{"state": "STOP"}`.
 To read the current state of this cover publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"state": ""}`.
 To change the position publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"position": VALUE}` where `VALUE` is a number between `0` and `100`.
+
+### Running (binary)
+Whether the motor is moving or not.
+Value can be found in the published state on the `running` property.
+It's not possible to read (`/get`) or write (`/set`) this value.
+If value equals `true` running is ON, if `false` OFF.
+
+### Motor_state (enum)
+Motor state.
+Value can be found in the published state on the `motor_state` property.
+It's not possible to read (`/get`) or write (`/set`) this value.
+The possible values are: `stopped`, `opening`, `closing`.
 
 ### Linkquality (numeric)
 Link quality (signal strength).
@@ -91,31 +117,4 @@ Value can be found in the published state on the `linkquality` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The minimal value is `0` and the maximum value is `255`.
 The unit of this value is `lqi`.
-
-## Manual Home Assistant configuration
-Although Home Assistant integration through [MQTT discovery](../integration/home_assistant) is preferred,
-manual integration is possible with the following configuration:
-
-
-{% raw %}
-```yaml
-cover:
-  - platform: "mqtt"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    command_topic: "zigbee2mqtt/<FRIENDLY_NAME>/set"
-    value_template: "{{ value_json.position }}"
-    set_position_template: "{ \"position\": {{ position }} }"
-    set_position_topic: "zigbee2mqtt/<FRIENDLY_NAME>/set"
-    position_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.linkquality }}"
-    unit_of_measurement: "lqi"
-    icon: "mdi:signal"
-```
-{% endraw %}
-
 

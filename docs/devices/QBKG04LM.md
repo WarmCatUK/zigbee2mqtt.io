@@ -1,22 +1,32 @@
 ---
 title: "Xiaomi QBKG04LM control via MQTT"
-description: "Integrate your Xiaomi QBKG04LM via Zigbee2MQTT with whatever smart home
- infrastructure you are using without the vendors bridge or gateway."
+description: "Integrate your Xiaomi QBKG04LM via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
+addedAt: 2019-07-22T20:08:17Z
+pageClass: device-page
 ---
 
-*To contribute to this page, edit the following
-[file](https://github.com/Koenkk/zigbee2mqtt.io/blob/master/docs/devices/QBKG04LM.md)*
+<!-- !!!! -->
+<!-- ATTENTION: This file is auto-generated through docgen! -->
+<!-- You can only edit the "Notes"-Section between the two comment lines "Notes BEGIN" and "Notes END". -->
+<!-- Do not use h1 or h2 heading within "## Notes"-Section. -->
+<!-- !!!! -->
 
 # Xiaomi QBKG04LM
 
+|     |     |
+|-----|-----|
 | Model | QBKG04LM  |
-| Vendor  | Xiaomi  |
+| Vendor  | [Xiaomi](/supported-devices/#v=Xiaomi)  |
 | Description | Aqara single key wired wall switch without neutral wire. Doesn't work as a router and doesn't support power meter |
-| Exposes | switch (state), action, linkquality |
-| Picture | ![Xiaomi QBKG04LM](../images/devices/QBKG04LM.jpg) |
+| Exposes | switch (state), action, operation_mode, linkquality |
+| Picture | ![Xiaomi QBKG04LM](https://www.zigbee2mqtt.io/images/devices/QBKG04LM.jpg) |
 
+
+<!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
 ## Notes
 
+### Debounce
+It is recommended to not use the `debounce` option for this device since this will prevent the `single` and `hold_release` actions from being sent.
 
 ### Deprecated click event
 By default this device exposes a deprecated `click` event. It's recommended to use the `action` event instead.
@@ -36,52 +46,17 @@ Press and hold the button on the device for +- 10 seconds
 (until the blue light starts blinking and stops blinking), release and wait.
 
 You may have to unpair the switch from an existing coordinator before the pairing process will start.
+If you can't do this, try to remove battery (if it has one), push the button (to completely discharge device), place the battery back and try pairing again.
+<!-- Notes END: Do not edit below this line -->
 
-### Device type specific configuration
-*[How to use device type specific configuration](../information/configuration.md)*
-
-* `legacy`: Set to `false` to disable the legacy integration (highly recommended!) (default: true)
+## OTA updates
+This device supports OTA updates, for more information see [OTA updates](../guide/usage/ota_updates.md).
 
 
-### Decoupled mode
-Decoupled mode allows to turn wired switch into wireless button with separately controlled relay.
-This might be useful to assign some custom actions to buttons and control relay remotely.
-This command also allows to redefine which button controls which relay for the double switch (not supported for QBKG25LM).
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
 
-Topic `zigbee2mqtt/FRIENDLY_NAME/system/set` should be used to modify operation mode.
-
-**NOTE:** For QBKG25LM instead of `system` use `left`, `center` or `right` and leave out the `button` property in the payload.
-
-Payload:
-```js
-{
-  "operation_mode": {
-    "button": "single"|"left"|"right", // Always use single for a single switch
-    "state": "VALUE"
-  }
-}
-```
-
-Values                | Description
-----------------------|---------------------------------------------------------
-`control_relay`       | Button directly controls relay (for single switch and QBKG25LM)
-`control_left_relay`  | Button directly controls left relay (for double switch, not supported for QBKG25LM)
-`control_right_relay` | Button directly controls right relay (for double switch, not supported for QBKG25LM)
-`decoupled`           | Button doesn't control any relay
-
-`zigbee2mqtt/FRIENDLY_NAME/system/get` to read current mode.
-
-Payload:
-```js
-{
-  "operation_mode": {
-    "button": "single"|"left"|"right" // Always use single for a single switch
-  }
-}
-```
-
-Response will be sent to `zigbee2mqtt/FRIENDLY_NAME`, example: `{"operation_mode_right":"control_right_relay"}`
-
+* `legacy`: Set to false to disable the legacy integration (highly recommended), will change structure of the published payload (default true). The value must be `true` or `false`
 
 
 ## Exposes
@@ -95,7 +70,14 @@ To read the current state of this switch publish a message to topic `zigbee2mqtt
 Triggered action (e.g. a button click).
 Value can be found in the published state on the `action` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
-The possible values are: `single`, `release`, `hold`.
+The possible values are: `release`, `hold`, `double`, `single`, `hold_release`.
+
+### Operation_mode (enum)
+Decoupled mode.
+Value can be found in the published state on the `operation_mode` property.
+It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"operation_mode": NEW_VALUE}`.
+The possible values are: `control_relay`, `decoupled`.
 
 ### Linkquality (numeric)
 Link quality (signal strength).
@@ -103,45 +85,4 @@ Value can be found in the published state on the `linkquality` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The minimal value is `0` and the maximum value is `255`.
 The unit of this value is `lqi`.
-
-## Manual Home Assistant configuration
-Although Home Assistant integration through [MQTT discovery](../integration/home_assistant) is preferred,
-manual integration is possible with the following configuration:
-
-
-{% raw %}
-```yaml
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    icon: "mdi:toggle-switch"
-    value_template: "{{ value_json.click }}"
-
-switch:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    payload_off: "OFF"
-    payload_on: "ON"
-    value_template: "{{ value_json.state }}"
-    command_topic: "zigbee2mqtt/<FRIENDLY_NAME>/set"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.action }}"
-    icon: "mdi:gesture-double-tap"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.linkquality }}"
-    unit_of_measurement: "lqi"
-    icon: "mdi:signal"
-```
-{% endraw %}
-
 

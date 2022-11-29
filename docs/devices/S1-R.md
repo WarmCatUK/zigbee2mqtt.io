@@ -1,38 +1,45 @@
 ---
 title: "Ubisys S1-R control via MQTT"
-description: "Integrate your Ubisys S1-R via Zigbee2MQTT with whatever smart home
- infrastructure you are using without the vendors bridge or gateway."
+description: "Integrate your Ubisys S1-R via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
+addedAt: 2021-02-28T13:58:01Z
+pageClass: device-page
 ---
 
-*To contribute to this page, edit the following
-[file](https://github.com/Koenkk/zigbee2mqtt.io/blob/master/docs/devices/S1-R.md)*
+<!-- !!!! -->
+<!-- ATTENTION: This file is auto-generated through docgen! -->
+<!-- You can only edit the "Notes"-Section between the two comment lines "Notes BEGIN" and "Notes END". -->
+<!-- Do not use h1 or h2 heading within "## Notes"-Section. -->
+<!-- !!!! -->
 
 # Ubisys S1-R
 
+|     |     |
+|-----|-----|
 | Model | S1-R  |
-| Vendor  | Ubisys  |
+| Vendor  | [Ubisys](/supported-devices/#v=Ubisys)  |
 | Description | Power switch S1-R |
-| Exposes | switch (state), power, action, linkquality |
-| Picture | ![Ubisys S1-R](../images/devices/S1-R.jpg) |
+| Exposes | switch (state), power, action, power_on_behavior, linkquality |
+| Picture | ![Ubisys S1-R](https://www.zigbee2mqtt.io/images/devices/S1-R.jpg) |
 
-## Notes
 
-### Device type specific configuration
-*[How to use device type specific configuration](../information/configuration.md)*
+<!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
 
-* `simulated_brightness`: Set to `true` to simulate a `brightness` value (default: `false`).
-If this device provides a `brightness_move_up` or `brightness_move_down` action it is possible to specify the update
-interval and delta. This can be done by instead of specifying `true`:
 
+<!-- Notes END: Do not edit below this line -->
+
+## OTA updates
+This device supports OTA updates, for more information see [OTA updates](../guide/usage/ota_updates.md).
+
+
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `simulated_brightness`: Simulate a brightness value. If this device provides a brightness_move_up or brightness_move_down action it is possible to specify the update interval and delta. Example:
 ```yaml
 simulated_brightness:
   delta: 20 # delta per interval, default = 20
   interval: 200 # interval in milliseconds, default = 200
 ```
-
-
-## OTA updates
-This device supports OTA updates, for more information see [OTA updates](../information/ota_updates.md).
 
 
 ## Exposes
@@ -55,67 +62,17 @@ Value can be found in the published state on the `action` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The possible values are: `toggle`, `on`, `off`, `recall_*`, `brightness_move_up`, `brightness_move_down`, `brightness_stop`.
 
+### Power_on_behavior (enum)
+Controls the behavior when the device is powered on.
+Value can be found in the published state on the `power_on_behavior` property.
+To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"power_on_behavior": ""}`.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"power_on_behavior": NEW_VALUE}`.
+The possible values are: `off`, `previous`, `on`.
+
 ### Linkquality (numeric)
 Link quality (signal strength).
 Value can be found in the published state on the `linkquality` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The minimal value is `0` and the maximum value is `255`.
 The unit of this value is `lqi`.
-
-## Manual Home Assistant configuration
-Although Home Assistant integration through [MQTT discovery](../integration/home_assistant) is preferred,
-manual integration is possible with the following configuration:
-
-
-{% raw %}
-```yaml
-switch:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    payload_off: "OFF"
-    payload_on: "ON"
-    value_template: "{{ value_json.state }}"
-    command_topic: "zigbee2mqtt/<FRIENDLY_NAME>/set"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.power }}"
-    unit_of_measurement: "W"
-    device_class: "power"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.action }}"
-    icon: "mdi:gesture-double-tap"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.linkquality }}"
-    unit_of_measurement: "lqi"
-    icon: "mdi:signal"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    icon: "mdi:update"
-    value_template: "{{ value_json['update']['state'] }}"
-
-binary_sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    payload_on: true
-    payload_off: false
-    value_template: "{{ value_json.update_available}}"
-```
-{% endraw %}
-
 

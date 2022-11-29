@@ -1,42 +1,70 @@
 ---
 title: "Develco SMSZB-120 control via MQTT"
-description: "Integrate your Develco SMSZB-120 via Zigbee2MQTT with whatever smart home
- infrastructure you are using without the vendors bridge or gateway."
+description: "Integrate your Develco SMSZB-120 via Zigbee2MQTT with whatever smart home infrastructure you are using without the vendor's bridge or gateway."
+addedAt: 2020-04-08T17:49:06Z
+pageClass: device-page
 ---
 
-*To contribute to this page, edit the following
-[file](https://github.com/Koenkk/zigbee2mqtt.io/blob/master/docs/devices/SMSZB-120.md)*
+<!-- !!!! -->
+<!-- ATTENTION: This file is auto-generated through docgen! -->
+<!-- You can only edit the "Notes"-Section between the two comment lines "Notes BEGIN" and "Notes END". -->
+<!-- Do not use h1 or h2 heading within "## Notes"-Section. -->
+<!-- !!!! -->
 
 # Develco SMSZB-120
 
+|     |     |
+|-----|-----|
 | Model | SMSZB-120  |
-| Vendor  | Develco  |
+| Vendor  | [Develco](/supported-devices/#v=Develco)  |
 | Description | Smoke detector with siren |
-| Exposes | temperature, battery, smoke, battery_low, tamper, warning, linkquality |
-| Picture | ![Develco SMSZB-120](../images/devices/SMSZB-120.jpg) |
+| Exposes | temperature, battery, smoke, battery_low, test, max_duration, alarm, reliability, fault, linkquality |
+| Picture | ![Develco SMSZB-120](https://www.zigbee2mqtt.io/images/devices/SMSZB-120.jpg) |
 
+
+<!-- Notes BEGIN: You can edit here. Add "## Notes" headline if not already present. -->
 ## Notes
 
 
-### Triggering alarm
+### Warning usage
+Warning only support a single mode, `burglar`
+
+Duration of using `warning` can be shorter than `max_duration` but not longer. If `max_duration` are set to 60 seconds, and you try to set `warning` with `duration` of 90 seconds, the warning will only apply for 60 seconds. Default value of `max_duration` are 240 seconds
+
+This device do not support the `strobe` and `strobe_duty_cycle` functionality
+
+
+### Triggering alarm (using old style `warning`)
 This smoke alarm can be triggered manually by publishing to `zigbee2mqtt/FRIENDLY_NAME/set` with the payloads:
 
-To start (Change `duration` in number of seconds to what you need):
-* `{"warning": {"mode": "burglar", "level": "high", "strobe": false, "duration": 300}}`
+To start :
+* `{"warning":{"duration":60,"level":"low","mode":"burglar","strobe":false,"strobe_duty_cycle":0}}`
+Where:
+- `duration`: the number of seconds the alarm will be on
+- `level`: `low`, `medium`, `high`, `very_high`
+- `mode`: `stop`, `burglar`
+- `strobe`: not supported
+- `strobe_duty_cycle`: not supported
 
 To stop:
-* `{"warning": {"mode": "stop", "level": "low", "strobe": false, "duration": 300}}`
+* `{"warning":{"duration":60,"level":"low","mode":"stop","strobe":false,"strobe_duty_cycle":0}}`
 
-### Device type specific configuration
-*[How to use device type specific configuration](../information/configuration.md)*
+### Triggering alarm, Simple
+Can be set by publishing to `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"alarm": "START"}` and `{"alarm": "OFF"}`
+Set `max_duration` from the Zigbee2MQTT UI or by publishing `{"max_duration": NEW_VALUE}`
+This alarm are preset to highest volume
+<!-- Notes END: Do not edit below this line -->
 
-* `temperature_precision`: Controls the precision of `temperature` values,
-e.g. `0`, `1` or `2`; default `2`.
-To control the precision based on the temperature value set it to e.g. `{30: 0, 10: 1}`,
-when temperature >= 30 precision will be 0, when temperature >= 10 precision will be 1.
-* `temperature_calibration`: Allows to manually calibrate temperature values,
-e.g. `1` would add 1 degree to the temperature reported by the device; default `0`.
+## OTA updates
+This device supports OTA updates, for more information see [OTA updates](../guide/usage/ota_updates.md).
 
+
+## Options
+*[How to use device type specific configuration](../guide/configuration/devices-groups.md#specific-device-options)*
+
+* `temperature_precision`: Number of digits after decimal point for temperature, takes into effect on next report of device. The value must be a number with a minimum value of `0` and with a with a maximum value of `3`
+
+* `temperature_calibration`: Calibrates the temperature value (absolute offset), takes into effect on next report of device. The value must be a number.
 
 
 ## Exposes
@@ -66,18 +94,38 @@ Value can be found in the published state on the `battery_low` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 If value equals `true` battery_low is ON, if `false` OFF.
 
-### Tamper (binary)
-Indicates whether the device is tampered.
-Value can be found in the published state on the `tamper` property.
+### Test (binary)
+Indicates whether the device is being tested.
+Value can be found in the published state on the `test` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
-If value equals `true` tamper is ON, if `false` OFF.
+If value equals `true` test is ON, if `false` OFF.
 
-### Warning (composite)
-Can be set by publishing to `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"warning": {"mode": VALUE, "level": VALUE, "strobe": VALUE, "duration": VALUE}}`
-- `mode` (enum): Mode of the warning (sound effect). Allowed values: `stop`, `burglar`, `fire`, `emergency`, `police_panic`, `fire_panic`, `emergency_panic`
-- `level` (enum): Sound level. Allowed values: `low`, `medium`, `high`, `very_high`
-- `strobe` (binary): Turn on/off the strobe (light) during warning. Allowed values: `true` or `false`
-- `duration` (numeric): Duration in seconds of the alarm. 
+### Max_duration (numeric)
+Duration of Siren.
+Value can be found in the published state on the `max_duration` property.
+To read (`/get`) the value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/get` with payload `{"max_duration": ""}`.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"max_duration": NEW_VALUE}`.
+The minimal value is `0` and the maximum value is `600`.
+The unit of this value is `s`.
+
+### Alarm (binary)
+Manual Start of Siren.
+Value will **not** be published in the state.
+It's not possible to read (`/get`) this value.
+To write (`/set`) a value publish a message to topic `zigbee2mqtt/FRIENDLY_NAME/set` with payload `{"alarm": NEW_VALUE}`.
+If value equals `START` alarm is ON, if `OFF` OFF.
+
+### Reliability (enum)
+Indicates reason if any fault.
+Value can be found in the published state on the `reliability` property.
+It's not possible to read (`/get`) or write (`/set`) this value.
+The possible values are: `no_fault_detected`, `unreliable_other`, `process_error`.
+
+### Fault (binary)
+Indicates whether the device are in fault state.
+Value can be found in the published state on the `fault` property.
+It's not possible to read (`/get`) or write (`/set`) this value.
+If value equals `true` fault is ON, if `false` OFF.
 
 ### Linkquality (numeric)
 Link quality (signal strength).
@@ -85,64 +133,4 @@ Value can be found in the published state on the `linkquality` property.
 It's not possible to read (`/get`) or write (`/set`) this value.
 The minimal value is `0` and the maximum value is `255`.
 The unit of this value is `lqi`.
-
-## Manual Home Assistant configuration
-Although Home Assistant integration through [MQTT discovery](../integration/home_assistant) is preferred,
-manual integration is possible with the following configuration:
-
-
-{% raw %}
-```yaml
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.temperature }}"
-    unit_of_measurement: "°C"
-    device_class: "temperature"
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.battery }}"
-    unit_of_measurement: "%"
-    device_class: "battery"
-
-binary_sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.smoke }}"
-    payload_on: true
-    payload_off: false
-    device_class: "smoke"
-
-binary_sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.battery_low }}"
-    payload_on: true
-    payload_off: false
-    device_class: "battery"
-
-binary_sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.tamper }}"
-    payload_on: true
-    payload_off: false
-
-sensor:
-  - platform: "mqtt"
-    state_topic: "zigbee2mqtt/<FRIENDLY_NAME>"
-    availability_topic: "zigbee2mqtt/bridge/state"
-    value_template: "{{ value_json.linkquality }}"
-    unit_of_measurement: "lqi"
-    icon: "mdi:signal"
-```
-{% endraw %}
-
 
